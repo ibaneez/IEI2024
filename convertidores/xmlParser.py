@@ -6,6 +6,20 @@ file = 'datos/monumentos.xml'
 tree = ET.parse(file)
 root = tree.getroot()
 
+def typeCheck(tipo):
+    answer = None
+    if tipo in("Yacimientos arqueológicos","Puente") :
+        return tipo
+    elif tipo in ("Iglesias y Ermitas", "Catedrales", "Sinagogas"):
+        answer = "Iglesia-Ermita"
+    elif tipo in ("Monasterios", "Santuarios"):
+        answer = "Monasterio-Convento"
+    elif tipo in ("Castillos", "Casas Nobles", "Torres"):
+        answer = "Castillo-Fortaleza-Torre"
+    elif tipo in ("Reales Sitios","Palacio","Casa consistorial"):
+        answer = "Edificio Singular"
+    return answer
+
 with open('datos/CLEdata.json', 'w', encoding='utf-8') as f:
 
     for monumento in root.iter('monumento'):
@@ -30,9 +44,12 @@ with open('datos/CLEdata.json', 'w', encoding='utf-8') as f:
         if descripcion is not None :
             descripcion = descripcion.text
 
+        tipo = monumento.find('tipoMonumento').text
+        tip = typeCheck(tipo)    
+
         item = {
             "name" : monumento.find('nombre').text,
-            "type" : monumento.find('tipoMonumento').text,
+            "type" : tip,
             "address" : calle,
             "postal code" : codpost,
             "longitude" : coords.find('longitud').text,
@@ -42,6 +59,3 @@ with open('datos/CLEdata.json', 'w', encoding='utf-8') as f:
             "provinceName" : provincia
         }
         json.dump(item, f, ensure_ascii=False, indent=4)
-
-
-    
